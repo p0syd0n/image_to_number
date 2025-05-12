@@ -8,7 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/workspace/image_to_number/src/main.c" "CMakeFiles/NeuralNetwork.dir/src/main.c.o" "gcc" "CMakeFiles/NeuralNetwork.dir/src/main.c.o.d"
+  "/home/posydon/programming/image_to_number/src/main.c" "CMakeFiles/NeuralNetwork.dir/src/main.c.o" "gcc" "CMakeFiles/NeuralNetwork.dir/src/main.c.o.d"
+  "" "NeuralNetwork" "gcc" "CMakeFiles/NeuralNetwork.dir/link.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

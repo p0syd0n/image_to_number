@@ -10,7 +10,7 @@ def write_file(name, size):
   normal_dist = np.random.normal(loc=mean, scale=std_dev, size=size)
   with open(name, "w") as file:
     for i in range(0, len(normal_dist)):
-      file.write(str(normal_dist[i])+" ")
+      file.write(str(round(normal_dist[i], 7))+" ")
     file.close()
 
 write_file("weight_layer_1.txt", 784*16)
