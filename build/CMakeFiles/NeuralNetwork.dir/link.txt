@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/NeuralNetwork.dir/src/main.c.o -o NeuralNetwork  -lm

@@ -1,0 +1,3 @@
+/workspace/image_to_number/build/CMakeFiles/NeuralNetwork.dir
+/workspace/image_to_number/build/CMakeFiles/edit_cache.dir
+/workspace/image_to_number/build/CMakeFiles/rebuild_cache.dir
