@@ -1,4 +1,5 @@
 import pygame
+import math
 
 pygame.init()
 pygame.display.set_caption("Pixel Drawing")
@@ -12,6 +13,7 @@ screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 clock = pygame.time.Clock()
 
 pixels = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+export_pixels_list = []
 
 def apply_brush(grid_x, grid_y, intensity=50):
     half = BRUSH_SIZE // 2
@@ -23,6 +25,15 @@ def apply_brush(grid_x, grid_y, intensity=50):
                 dist = (dx ** 2 + dy ** 2) ** 1
                 fade = max(0, intensity - int(dist * 40))
                 pixels[y][x] = min(255, pixels[y][x] + fade)
+            
+def export_pixels():
+    for y in range(len(pixels)):
+        for x in range(len(pixels[y])):
+            val = pixels[y][x]
+            val /= 255
+            val = math.trunc(val * 10) / 10
+            export_pixels_list.append(val)
+    return export_pixels_list
 
 running = True
 while running:
@@ -44,8 +55,10 @@ while running:
 
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
+            print(export_pixels())
             pixels = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
         if event.type == pygame.QUIT:
+            print(export_pixels())
             running = False
 
     pygame.display.flip()
