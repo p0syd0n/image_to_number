@@ -13,7 +13,6 @@ def write_file(name, size):
       file.write(str(round(normal_dist[i], 6))+" ")
     file.close()
 
-write_file("weight_layer_1.txt", 784*16)
-
-write_file("weight_layer_2.txt", 16)
-write_file("weight_layer_3.txt", 16)
+write_file("weight_layer_input.txt", 784*16)
+write_file("weight_layer_1.txt", 16*16)
+write_file("weight_layer_2.txt", 16*16)

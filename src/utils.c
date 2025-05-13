@@ -52,6 +52,7 @@ int load_weights_1_from_file(double array[num_neurons_per_layer][num_inputs], ch
     }
     //printf("Read: %lf\n", temp_number);
   }
+  printf("Loaded input weights from file\n");
   return 0;
 }
 
@@ -80,5 +81,13 @@ int load_weights_other_from_file(double array[num_neurons_per_layer][num_neurons
     }
     //printf("Read: %lf\n", temp_number);
   }
+  printf("Loaded regular weights from file\n");
   return 0;
 }
+
+void initialize_bias(double* bias_array, int size, double value) {
+  for (int i = 0; i < size; i++) {
+      bias_array[i] = value;
+  }
+}
+
