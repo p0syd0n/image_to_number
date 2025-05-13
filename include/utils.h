@@ -5,7 +5,19 @@
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#define data_location "data/"
+#define num_inputs 784 // 28 * 28 pixels
+
+
+#define num_neurons_per_layer 16
 
 double relu(double x);
+
+// This one is special because there are more inputs, and therefore weights for the first layer of neurons
+int load_weights_1_from_file(double array[num_neurons_per_layer][num_inputs], char filename[]);
+
+int load_weights_other_from_file(double array[num_neurons_per_layer][num_neurons_per_layer], char filename[]);
+// Just building a filepath from filename
+void buildfilepath(char** result, char filename[]);
 
 #endif

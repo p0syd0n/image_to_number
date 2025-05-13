@@ -1,3 +1,0 @@
-/home/posydon/programming/image_to_number/build/CMakeFiles/NeuralNetwork.dir
-/home/posydon/programming/image_to_number/build/CMakeFiles/edit_cache.dir
-/home/posydon/programming/image_to_number/build/CMakeFiles/rebuild_cache.dir
