@@ -5,5 +5,5 @@ perhaps.
 ``` sudo apt-get install gsl```  
 ```sudo apt-get install make```
 ### start:
-```chmod +x go.sh```  
-```./go.sh```
+```make```
+```make run```
