@@ -15,10 +15,21 @@ $(BUILD_DIR)/$(EXECUTABLE): $(SOURCES) $(HEADERS)
 run: all
 	./$(BUILD_DIR)/$(EXECUTABLE)
 
+train: all
+	echo "Generating starter weights"
+	python3 /data/weights.py
+	./$(BUILD_DIR)/$(EXECUTABLE) 1
+
+test: all
+	./$(BUILD_DIR)/$(EXECUTABLE) 2
+
+image: all
+	./$(BUILD_DIR)/$(EXECUTABLE) 3 file.txt
+
 clean:
 	rm -rf $(BUILD_DIR)
 
-test: all
-	@echo "Running tests..."
+# test: all
+# 	@echo "Running tests..."
 
 .PHONY: all run clean test

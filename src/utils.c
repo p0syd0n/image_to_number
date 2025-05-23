@@ -4,6 +4,80 @@
 
 #include "../include/utils.h"
 
+size_t FindIndex( const int a[], size_t size, int value )
+{
+    size_t index = 0;
+
+    while ( index < size && a[index] != value ) ++index;
+
+    return ( index == size ? -1 : index );
+}
+
+void write_weights(double *weights, size_t weights_len, int layer) {
+  // Build the filename:
+
+  // Get the layer int as a string
+  int length = snprintf(NULL, 0, "%d", layer);
+  char* layer_string = malloc(length+1);
+  snprintf(layer_string, length+1, "%d", layer);
+
+  // Build the actual filename string
+  char prefix[] = "weight_trained_";
+  char suffix[] = ".txt";
+  char* filename = malloc(strlen(prefix) + length + strlen(suffix) + 1);
+  strcpy(filename, prefix);
+  strcat(filename, layer_string);
+  strcat(filename, suffix);
+  printf("%s\n", filename);
+
+  char** result = malloc(sizeof(char));
+  buildfilepath(result, filename, 2);
+  FILE *fptr;
+
+  fptr = fopen(*result, "a");
+  for (size_t i = 0; i<weights_len; i++) {
+    fprintf(fptr, "%lf ", weights[i]);
+  }
+
+  fclose(fptr);
+  free(result);
+  free(filename);
+  free(layer_string);
+}
+
+void write_bias(double* bias, size_t size, int layer) {
+  // Build the filename:
+
+  // Get the layer int as a string
+  int length = snprintf(NULL, 0, "%d", layer);
+  char* layer_string = malloc(length+1);
+  snprintf(layer_string, length+1, "%d", layer);
+
+  // Build the actual filename string
+  char prefix[] = "bias_trained_";
+  char suffix[] = ".txt";
+  char* filename = malloc(strlen(prefix) + length + strlen(suffix) + 1);
+  strcpy(filename, prefix);
+  strcat(filename, layer_string);
+  strcat(filename, suffix);
+  printf("%s\n", filename);
+
+  char** result = malloc(sizeof(char));
+  buildfilepath(result, filename, 2);
+  FILE *fptr;
+
+
+  fptr = fopen(*result, "w");
+  for (size_t i = 0; i<size; i++) {
+    fprintf(fptr, "%lf ", bias[i]);
+  }
+
+  fclose(fptr);
+  free(result);
+  free(filename);
+  free(layer_string);
+}
+
 void buildfilepath(char** result, char filename[], int type) {
   char* prefix_path;
   switch (type) {
@@ -36,97 +110,34 @@ void buildfilepath(char** result, char filename[], int type) {
   *result = temp;
 }
 
-
 double relu(double x) {
   return MAX(0, x);
 }
 
-int load_weights_1_from_file(double array[num_neurons_per_layer][num_inputs], char filename[]){
-  char** filepath =  malloc(sizeof(char*));
-  buildfilepath(filepath, filename, 2);
-
-  FILE *fptr = fopen(*filepath, "r");
-  if (fptr == NULL) {
-      perror("File Open Error Loading Weights");
-      return -1;
-  }
-
-  double temp_number;
-  int counter_row = 0;
-  int counter_column = 0;
-
-  while(fscanf(fptr, "%lf", &temp_number) == 1) {
-    array[counter_row][counter_column] = temp_number;
-    counter_column++;
-    if (counter_column >= num_inputs) {
-        counter_column = 0;
-        counter_row ++;
-    }
-    if (counter_row >= num_neurons_per_layer) {
-      break;
-    }
-    //printf("Read: %lf\n", temp_number);
-  }
-  printf("Loaded input weights from file\n");
-  return 0;
+double relu_derivative(double x) {
+  return x > 0 ? 1.0 : 0.0;
 }
-
-int load_weights_other_from_file(double array[num_neurons_per_layer][num_neurons_per_layer], char filename[]){
-  char** filepath =  malloc(sizeof(char*));
-  buildfilepath(filepath, filename, 2);
-  FILE *fptr = fopen(*filepath, "r");
-  if (fptr == NULL) {
-      perror("File Open Error Loading Weights");
-      return -1;
-  }
-
-  double temp_number;
-  int counter_row = 0;
-  int counter_column = 0;
-
-  while(fscanf(fptr, "%lf", &temp_number) == 1) {
-    array[counter_row][counter_column] = temp_number;
-    counter_column++;
-    if (counter_column >= num_neurons_per_layer) {
-        counter_column = 0;
-        counter_row ++;
-    }
-    if (counter_row >= num_neurons_per_layer) {
-      break;
-    }
-    //printf("Read: %lf\n", temp_number);
-  }
-  printf("Loaded regular weights from file\n");
-  return 0;
-}
-
 
 int load_weights_from_file_to_neurons(Neuron *neurons, char filename[], int size, bool input){
   // Build path
   char** filepath =  malloc(sizeof(char*));
   buildfilepath(filepath, filename, 2);
-  printf("Weight Filepath: %s\n", *filepath);
 
   FILE *fptr = fopen(*filepath, "r");
   if (fptr == NULL) {
       perror("File Open Error Loading Weights");
       return -1;
   }
-  printf("Wasnt't a fopen issue\n");
 
   int neuron_counter = 0;
   int neuron_index = 0;
   double temp_number;
   int number_loaded = 0;
 
-
   while(fscanf(fptr, "%lf", &temp_number) == 1) {
-    printf("[%d]: %lf\n", number_loaded, temp_number);
-    //if (temp_number == 0) return -1;
     if (input) {
     // weights1 is larger - since in the first layer, we need to store enough weights for num_inputs inputs
       neurons[neuron_counter].weights1[neuron_index] = temp_number;
-      printf("Set weight index %d of neuron %d to %lf\n", neuron_index, neuron_counter, temp_number);
     } else {
       neurons[neuron_counter].weights[neuron_index] = temp_number;
     }
@@ -141,6 +152,7 @@ int load_weights_from_file_to_neurons(Neuron *neurons, char filename[], int size
 
   printf("Loaded %d weights from file to neurons\n", number_loaded);
   fclose(fptr);
+  free(filepath);
   return 0;
 }
 
@@ -149,7 +161,6 @@ int load_bias_from_file_to_neurons(Neuron *neurons, char filename[]) {
     char** filepath =  malloc(sizeof(char*));
 
     buildfilepath(filepath, filename, 3);
-    printf("Bias Filepath: %s\n", *filepath);
 
     FILE *fptr = fopen(*filepath, "r");
     if (fptr == NULL) {
@@ -157,15 +168,16 @@ int load_bias_from_file_to_neurons(Neuron *neurons, char filename[]) {
         return -1;
     }
   
-    int neuron_counter = 0;
+    int bias_index = 0;
     double temp_number;
   
     while(fscanf(fptr, "%lf", &temp_number) == 1) {
-      neurons[neuron_counter].bias = temp_number;
-      neuron_counter++;
+      neurons[bias_index].bias = temp_number;
+      bias_index++;
     }
   
-    printf("Loaded biases from file\n");
+    printf("Loaded %d biases from file\n", bias_index);
     fclose(fptr);
+    free(filepath);
     return 0;
 }

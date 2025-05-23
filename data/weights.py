@@ -20,14 +20,12 @@ def write_file(name, size):
     file.close()
 
 write_file("weight/weight_layer_1.txt", 784*16)
-write_file("weight/weight_layer_2.txt", 16*16)
-write_file("weight/weight_layer_final.txt", 16*16)
+write_file("weight/weight_layer_3.txt", 16*16)
 
 
 biases_layer1 = ["0.5"] * 784
 biases_layers2final = ["0.5"] * 16
 
 write_biases("bias/bias_layer_1.txt", biases_layer1)
-write_biases("bias/bias_layer_2.txt", biases_layers2final)
-write_biases("bias/bias_layer_final.txt", biases_layers2final)
+write_biases("bias/bias_layer_3.txt", biases_layers2final)
 

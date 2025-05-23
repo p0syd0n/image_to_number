@@ -1,2 +1,4 @@
 /build
+/venv
 temp.py
+log.txt
