@@ -1,6 +1,5 @@
 import pygame
 import math
-import os
 
 pygame.init()
 pygame.display.set_caption("Pixel Drawing")
@@ -14,6 +13,7 @@ screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 clock = pygame.time.Clock()
 
 pixels = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+export_pixels_list = []
 
 def apply_brush(grid_x, grid_y, intensity=50):
     half = BRUSH_SIZE // 2
@@ -22,20 +22,17 @@ def apply_brush(grid_x, grid_y, intensity=50):
             x = grid_x + dx
             y = grid_y + dy
             if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
-                dist = (dx ** 2 + dy ** 2) ** 0.5
+                dist = (dx ** 2 + dy ** 2) ** 1
                 fade = max(0, intensity - int(dist * 40))
                 pixels[y][x] = min(255, pixels[y][x] + fade)
-
+            
 def export_pixels():
-    export_pixels_list = []
-    for y in range(GRID_SIZE):
-        for x in range(GRID_SIZE):
+    for y in range(len(pixels)):
+        for x in range(len(pixels[y])):
             val = pixels[y][x]
-            # Invert and normalize pixel (MNIST has white=1, black=0)
-            norm_val = (255 - val) / 255
-            # Optional: round to 1 decimal place
-            norm_val = math.trunc(norm_val * 10) / 10
-            export_pixels_list.append(norm_val)
+            val /= 255
+            val = math.trunc(val * 10) / 10
+            export_pixels_list.append(val)
     return export_pixels_list
 
 running = True
@@ -58,22 +55,19 @@ while running:
 
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key ==  pygame.K_SPACE:
                 try:
                     os.remove("pixels.txt")
-                except FileNotFoundError:
+                except:
                     pass
                 with open("pixels.txt", "a") as file:
                     for i in export_pixels():
                         file.write(str(i) + " ")
-                print("Wrote data to pixels.txt")
-            elif event.key == pygame.K_ESCAPE:
-                running = False
+                print("Wrote data")
         if event.type == pygame.QUIT:
             running = False
-
+    
     pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
-

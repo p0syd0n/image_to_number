@@ -67,8 +67,9 @@ int main(int argc, char* argv[])
             printf("./%s <mode> [filename]", argv[0]);
             exit(-1);
         }
+        input_filename = (char*)malloc(strlen(argv[2]));
         strcpy(input_filename, argv[2]);
-
+        printf("Strcpyd\n");
         bias_layer_1_filename = (char *)malloc(strlen("bias_trained_1.txt")+1);
         strcpy(bias_layer_1_filename, "bias_trained_1.txt");
 
@@ -142,6 +143,7 @@ int main(int argc, char* argv[])
             image_list = calloc(num_inputs, sizeof(double));
             while (counter < num_inputs && fscanf(fptr, "%lf", &temp_double) == 1) {
                 image_list[counter++] = temp_double;
+                printf("Temp double: %lf\n", temp_double);
             }
             break;
         }
@@ -188,8 +190,7 @@ int main(int argc, char* argv[])
             // Set layer 1 neuron
             layer_1[next_neuron].output = dot_product;
         }
-
-        // Populate layer final
+    // Populate layer final
         for (int next_neuron = 0; next_neuron < num_outputs; next_neuron++) {
             // Convert to GSL vectors
             for (int input_index = 0; input_index < num_neurons_per_layer; input_index++) {
@@ -209,20 +210,17 @@ int main(int argc, char* argv[])
         }
 
         // Time to softmax
-        log_fast("Softmaxing now : counting total\n");
         // 1: Find the maximum output value for numerical stability
         double max = -INFINITY;
         for (int i = 0; i < num_outputs; i++) {
             if (layer_final[i].output > max)
                 max = layer_final[i].output;
         }
-
         // 2: Compute the sum of exponentials of the shifted outputs
         double total = 0;
         for (int i = 0; i < num_outputs; i++) {
             total += exp(layer_final[i].output - max);
         }
-
         // 3: Compute the softmax percentages (probabilities)
         int predicted_class = 0;
         for (int i = 0; i < num_outputs; i++) {
@@ -231,8 +229,11 @@ int main(int argc, char* argv[])
             // Track the class with the highest probability
             if (layer_final[i].percent > layer_final[predicted_class].percent) {
                 predicted_class = i;
-                if (mode == 3)
+                if (mode == 3) {
+                    printf("Predicted Class: %d\n", predicted_class);
                     exit(predicted_class);
+
+                }
             }
         }
 

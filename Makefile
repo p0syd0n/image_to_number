@@ -24,7 +24,7 @@ test: all
 	./$(BUILD_DIR)/$(EXECUTABLE) 2
 
 image: all
-	./$(BUILD_DIR)/$(EXECUTABLE) 3 file.txt
+	./$(BUILD_DIR)/$(EXECUTABLE) 3 pixels.txt
 
 clean:
 	rm -rf $(BUILD_DIR)
