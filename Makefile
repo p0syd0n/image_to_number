@@ -16,8 +16,8 @@ run: all
 	./$(BUILD_DIR)/$(EXECUTABLE)
 
 train: all
-	echo "Generating starter weights"
-	python3 /data/weights.py
+	@echo "Generating new weights"
+	python3 data/weights.py 
 	./$(BUILD_DIR)/$(EXECUTABLE) 1
 
 test: all

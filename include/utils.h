@@ -13,6 +13,7 @@
 #define num_inputs 784 // 28 * 28 pixels
 #define num_outputs 10
 #define num_neurons_per_layer 16
+#define training_image_count_thousands 60
 
 typedef struct {
   double input_value;
@@ -25,6 +26,7 @@ typedef struct {
   double delta;
 } Neuron;
 
+void write_accuracy_to_file(double accuracy[training_image_count_thousands]);
 size_t FindIndex( const int a[], size_t size, int value );
 void write_weights(double *weights, size_t weight_len, int layer);
 void write_bias(double* bias, size_t size, int layer);

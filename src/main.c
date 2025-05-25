@@ -12,6 +12,7 @@
 #define learning_rate 0.01
 char log_buffer[LOG_BUFFER_SIZE];
 size_t log_index = 0;
+double accuracy_track_record[training_image_count_thousands];
 
 // Buffer logging system
 void log_fast(const char* format, ...) {
@@ -24,7 +25,7 @@ void log_fast(const char* format, ...) {
 int main(int argc, char* argv[])
 {
     if (argc < 2) {
-        printf("./file <mode> [filename]");
+        printf("./%s <mode> [filename]", argv[0]);
         exit(-1);
     }
 
@@ -36,7 +37,6 @@ int main(int argc, char* argv[])
     char* input_filename;
 
     int mode = atoi(argv[1]);
-    printf("Mode: %d Input: %s\n", mode, input_filename);
     // Mode 1: training mode
     if (mode == 1) {
         bias_layer_1_filename = (char *)malloc(strlen("bias_layer_1.txt")+1);
@@ -64,11 +64,10 @@ int main(int argc, char* argv[])
         strcpy(weight_layer_3_filename, "weight_trained_3.txt");
     } else if (mode == 3) { // Mode 3: demo / run
         if (argc < 3) {
-            printf("./file <mode> [filename]");
+            printf("./%s <mode> [filename]", argv[0]);
             exit(-1);
         }
-
-        input_filename = argv[2];
+        strcpy(input_filename, argv[2]);
 
         bias_layer_1_filename = (char *)malloc(strlen("bias_trained_1.txt")+1);
         strcpy(bias_layer_1_filename, "bias_trained_1.txt");
@@ -82,6 +81,9 @@ int main(int argc, char* argv[])
         weight_layer_3_filename = (char *)malloc(strlen("weight_trained_3.txt")+1);
         strcpy(weight_layer_3_filename, "weight_trained_3.txt");
     }
+
+    printf("Mode: %d Input: %s\n", mode, input_filename);
+
 
     // layer input is initial pixels for 1 image
     Neuron layer_0[num_inputs] = {0};
@@ -310,7 +312,9 @@ int main(int argc, char* argv[])
 
         // Selectively log
         if (i % 1000 == 0) {
-            printf("%d images done, %lf%% accuracy\n", i, (double)(100)*right/(wrong+right));
+            printf("\r%6d images done, %6.2lf%% accuracy     ", i, (double)(100)*right/(wrong+right));
+            fflush(stdout);
+            accuracy_track_record[i/1000] = (double)(100)*right/(wrong+right);
         }
 
         FILE* f = fopen("log.txt", "w");
@@ -324,6 +328,7 @@ int main(int argc, char* argv[])
     printf("Right: %d\nWrong:%d\n", right, wrong);
 
     if (mode == 1) {
+        write_accuracy_to_file(accuracy_track_record);
         //  Initialize arrays for later. It is much easier to 
         //  iterate over an array and write each one of the elements 
         //  than it is to go over each neuron and take its weight vector.
@@ -346,15 +351,28 @@ int main(int argc, char* argv[])
                 weights_layer_final[counter++] = layer_final[i].weights[j];
             }
         }
-
-        for (int i = 0; i < num_inputs; i++) {
+        for (int i = 0; i < num_neurons_per_layer; i++) {
             biases_layer_1[i] = layer_1[i].bias;
+        }
+        
+
+        for (int i = 0; i < num_neurons_per_layer; i++) {
+            biases_layer_final[i] = layer_final[i].bias;
         }
     
         write_weights(weights_layer_1, num_inputs*num_neurons_per_layer, 1);
-    
         write_weights(weights_layer_final, num_neurons_per_layer*num_neurons_per_layer, 3);
+        write_bias(biases_layer_1, num_neurons_per_layer, 1);
+        write_bias(biases_layer_final, num_neurons_per_layer, 3);
     }
+    free(bias_layer_1_filename);
+    free(bias_layer_3_filename);
+    free(weight_layer_1_filename);
+    free(weight_layer_3_filename);
+    free(image_list);
+    if (mode == 1 || mode == 2)
+        free(true_labels);
+
 }
 /* 
     TODO:
