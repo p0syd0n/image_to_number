@@ -2,3 +2,5 @@
 /venv
 temp.py
 log.txt
+/data/bias
+/data/weight
