@@ -1,9 +1,10 @@
 # A neural network?
 perhaps.
 ## How to use? 
-### dependencies:
+### dependencies:  
+Make sure you have GSl installed
 ``` sudo apt-get install libgsl-dev```  
-```sudo apt-get install make```
+
 ### start:
-```make```
-```make run```
+```make train```
+```make test```
