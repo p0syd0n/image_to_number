@@ -9,7 +9,7 @@
 #include "../include/utils.h"
 
 #define LOG_BUFFER_SIZE 1024000
-#define learning_rate 0.01
+#define learning_rate 0.008
 char log_buffer[LOG_BUFFER_SIZE];
 size_t log_index = 0;
 double accuracy_track_record[training_image_count_thousands];
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     char *bias_layer_3_filename;
     char *weight_layer_1_filename;
     char *weight_layer_3_filename;
-    char* input_filename;
+    char *input_filename;
 
     int mode = atoi(argv[1]);
     // Mode 1: training mode
@@ -84,7 +84,6 @@ int main(int argc, char* argv[])
     }
 
     printf("Mode: %d Input: %s\n", mode, input_filename);
-
 
     // layer input is initial pixels for 1 image
     Neuron layer_0[num_inputs] = {0};
@@ -190,7 +189,7 @@ int main(int argc, char* argv[])
             // Set layer 1 neuron
             layer_1[next_neuron].output = dot_product;
         }
-    // Populate layer final
+        // Populate layer final
         for (int next_neuron = 0; next_neuron < num_outputs; next_neuron++) {
             // Convert to GSL vectors
             for (int input_index = 0; input_index < num_neurons_per_layer; input_index++) {
@@ -375,7 +374,3 @@ int main(int argc, char* argv[])
         free(true_labels);
 
 }
-/* 
-    TODO:
-        - modularize each layer step? 
-*/
