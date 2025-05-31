@@ -1,5 +1,5 @@
 # A neural network?
-perhaps.
+Yes. Trained on MNIST handwritten digits.
 ## How to use? 
 ### dependencies:  
 Make sure you have GSL installed  
