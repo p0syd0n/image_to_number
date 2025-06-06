@@ -168,8 +168,6 @@ int main(int argc, char* argv[])
             break;
     }
 
-    double total_loss = 0;
-
     int right = 0;
     int wrong = 0;
     for (int epoch = 1; epoch <= EPOCHS; epoch++) {
@@ -273,7 +271,6 @@ int main(int argc, char* argv[])
             for (int q = 0; q < num_outputs; q++) {
                 total += exp(layer_final[q].output - max);
             }
-            //log_fast("EXPONENT SUMMATION (SOFTMAX DENOMINATOR): %lf\n", total);
 
             // 3: Compute the softmax percentages (probabilities)
             int predicted_class = 0;
@@ -292,8 +289,12 @@ int main(int argc, char* argv[])
                 }
             }
             if (mode == 3)
+            // Because in a possible implementation, this binary would be run as an internal component, and I dont fucking
+        // know how to deal with that so here we are.
                 exit(predicted_class);
 
+
+                
             // !! EVERYTHING PAST HERE HAPPENS ONLY FOR TRAINING/TESTING !! //
 
             // 4: Compare with actual label and increment counters

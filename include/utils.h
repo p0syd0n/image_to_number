@@ -14,7 +14,7 @@
 #define num_outputs 10
 #define num_neurons_per_layer 256
 #define training_image_count_thousands 60
-#define EPOCHS 15
+#define EPOCHS 5
 
 typedef struct {
   double input_value;
