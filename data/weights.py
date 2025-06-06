@@ -2,8 +2,12 @@ import math
 import numpy as np
 
 mean = 0
-std_dev = 2/784
-num_neurons = 16
+num_inputs = 784
+num_neurons = 256
+
+def calc_stddev(fan_in):
+    return math.sqrt(2 / fan_in)
+
 def write_biases(filename, values):
   with open(filename, "w") as file:
     for value in values:
@@ -11,21 +15,28 @@ def write_biases(filename, values):
     file.close()
 
 
-def write_file(name, size):
-  global mean, std_dev
-  normal_dist = np.random.normal(loc=mean, scale=std_dev, size=size)
-  with open(name, "w") as file:
-    for i in range(0, len(normal_dist)):
-      file.write(str(round(normal_dist[i], 6))+" ")
-    file.close()
-
-write_file("data/weight/weight_layer_1.txt", 784*num_neurons)
-write_file("data/weight/weight_layer_3.txt", num_neurons*num_neurons)
+def write_file(name, size, std_dev):
+    normal_dist = np.random.normal(loc=0, scale=std_dev, size=size)
+    with open(name, "w") as file:
+        for value in normal_dist:
+            file.write(f"{round(value, 6)} ")
 
 
 biases_layer1 = ["0.5"] * num_neurons
+biases_layer2 = ["0.5"] * num_neurons
 biases_layersfinal = ["0.5"] * num_neurons
 
+write_file("data/weight/weight_layer_1.txt", num_inputs*num_neurons, calc_stddev(num_inputs))
+write_file("data/weight/weight_layer_2.txt", num_neurons*num_neurons, calc_stddev(num_neurons))
+write_file("data/weight/weight_layer_3.txt", num_neurons*num_neurons, calc_stddev(num_neurons))
+
 write_biases("data/bias/bias_layer_1.txt", biases_layer1)
+
+write_biases("data/bias/bias_layer_2.txt", biases_layer2)
+
 write_biases("data/bias/bias_layer_3.txt", biases_layersfinal)
+
+
+
+
 

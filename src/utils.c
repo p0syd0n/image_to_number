@@ -14,13 +14,32 @@ size_t FindIndex( const int a[], size_t size, int value )
     return ( index == size ? -1 : index );
 }
 
-void write_accuracy_to_file(double accuracy[training_image_count_thousands]) {
+char* alloc_filename(const char* name) {
+    char* filename = (char*)malloc(strlen(name) + 1);
+    if (!filename) {
+        fprintf(stderr, "Memory allocation failed for filename: %s\n", name);
+        exit(1);
+    }
+    strcpy(filename, name);
+    return filename;
+}
+
+
+void write_accuracy_to_file(double accuracy[EPOCHS][training_image_count_thousands]) {
   FILE *fptr = fopen("accuracy.txt", "w");
   int counter = 0;
+  int mini_counter = 0;
   while (counter < training_image_count_thousands) {
-    fprintf(fptr, "%lf ", accuracy[counter++]);
+    if (mini_counter == training_image_count_thousands) {
+      mini_counter = 0;
+      counter++;
+    }
+    if (counter == EPOCHS)
+      return;
+    
+    fprintf(fptr, "%lf ", accuracy[counter][mini_counter++]);
+    
   }
-  printf("Write accuracy to file\n");
 }
 
 void write_weights(double *weights, size_t weights_len, int layer) {
@@ -38,7 +57,6 @@ void write_weights(double *weights, size_t weights_len, int layer) {
   strcpy(filename, prefix);
   strcat(filename, layer_string);
   strcat(filename, suffix);
-  printf("%s\n", filename);
 
   char** result = malloc(sizeof(char));
   buildfilepath(result, filename, 2);
@@ -75,17 +93,19 @@ void write_bias(double* bias, size_t size, int layer) {
   strcpy(filename, prefix);
   strcat(filename, layer_string);
   strcat(filename, suffix);
-  printf("%s\n", filename);
 
   char** result = malloc(sizeof(char));
   buildfilepath(result, filename, 3);
   FILE *fptr;
+  int counter = 0;
 
 
   fptr = fopen(*result, "w");
   for (size_t i = 0; i<size; i++) {
     fprintf(fptr, "%lf ", bias[i]);
+    counter++;
   }
+  printf("Wrote %d biases to %s\n", counter, filename);
 
   fclose(fptr);
   free(result);
@@ -126,14 +146,14 @@ void buildfilepath(char** result, char filename[], int type) {
 }
 
 double relu(double x) {
-  return MAX(0, x);
+    return x > 0 ? x : 0.01 * x;
 }
 
 double relu_derivative(double x) {
-  return x > 0 ? 1.0 : 0.0;
+    return x > 0 ? 1.0 : 0.01;
 }
 
-int load_weights_from_file_to_neurons(Neuron *neurons, char filename[], int size, bool input){
+int load_weights_from_file_to_neurons_H(HiddenNeuron *neurons, char filename[], int size, bool input){
   // Build path
   char** filepath =  malloc(sizeof(char*));
   buildfilepath(filepath, filename, 2);
@@ -150,12 +170,75 @@ int load_weights_from_file_to_neurons(Neuron *neurons, char filename[], int size
   int number_loaded = 0;
 
   while(fscanf(fptr, "%lf", &temp_number) == 1) {
-    if (input) {
-    // weights1 is larger - since in the first layer, we need to store enough weights for num_inputs inputs
-      neurons[neuron_counter].weights1[neuron_index] = temp_number;
-    } else {
-      neurons[neuron_counter].weights[neuron_index] = temp_number;
+    neurons[neuron_counter].weights[neuron_index] = temp_number;
+    number_loaded++;
+
+    neuron_index++;
+    if (neuron_index >= size) {
+      neuron_counter++;
+      neuron_index = 0;
     }
+  }
+
+  if (number_loaded != num_neurons_per_layer*size) {
+    printf("Error: weight mismatch. Expected: %d Loaded: %d\n", num_neurons_per_layer*size, number_loaded);
+    exit(-1);
+  }
+  printf("Loaded %d / %d weights from %s\n", number_loaded, size*num_neurons_per_layer, filename);
+  fclose(fptr);
+  free(filepath);
+  return 0;
+}
+
+int load_bias_from_file_to_neurons_H(HiddenNeuron *neurons, char filename[]) {
+    // Build path
+    char** filepath =  malloc(sizeof(char*));
+
+    buildfilepath(filepath, filename, 3);
+
+    FILE *fptr = fopen(*filepath, "r");
+    if (fptr == NULL) {
+        perror("File Open Error Loading Biases");
+        return -1;
+    }
+  
+    int bias_index = 0;
+    double temp_number;
+  
+    while(fscanf(fptr, "%lf", &temp_number) == 1) {
+      neurons[bias_index].bias = temp_number;
+      bias_index++;
+    }
+
+    if (bias_index != num_neurons_per_layer) {
+      printf("Error: bias mismatch. Expected: %d Loaded: %d\n", num_neurons_per_layer, bias_index);
+      exit(-1);
+    }
+  
+    printf("Loaded %d / %d biases from %s\n", bias_index, num_neurons_per_layer, filename);
+    fclose(fptr);
+    free(filepath);
+    return 0;
+}
+
+int load_weights_from_file_to_neurons_O(OutputNeuron *neurons, char filename[], int size, bool input){
+  // Build path
+  char** filepath =  malloc(sizeof(char*));
+  buildfilepath(filepath, filename, 2);
+
+  FILE *fptr = fopen(*filepath, "r");
+  if (fptr == NULL) {
+      perror("File Open Error Loading Weights");
+      return -1;
+  }
+
+  int neuron_counter = 0;
+  int neuron_index = 0;
+  double temp_number;
+  int number_loaded = 0;
+
+  while(fscanf(fptr, "%lf", &temp_number) == 1) {
+    neurons[neuron_counter].weights[neuron_index] = temp_number;
     number_loaded++;
 
     neuron_index++;
@@ -174,7 +257,7 @@ int load_weights_from_file_to_neurons(Neuron *neurons, char filename[], int size
   return 0;
 }
 
-int load_bias_from_file_to_neurons(Neuron *neurons, char filename[]) {
+int load_bias_from_file_to_neurons_O(OutputNeuron *neurons, char filename[]) {
     // Build path
     char** filepath =  malloc(sizeof(char*));
 
